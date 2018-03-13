@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "wallabag.fullname" . }}
+  labels:
+    app: {{ template "wallabag.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ .Values.service.port }} 
+    targetPort: {{ .Values.service.port}}
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ template "wallabag.fullname" . }}
+

@@ -1,0 +1,72 @@
+# PostgresQL => 'pdo_pgsql'
+# MySQL => 'pdo_mysql'
+database:
+  driver: pdo_sqlite 
+  name: wallabag
+  user: wallabag-user
+  password: Me3hlqSpnV7A15LFOxzS2nmsZ
+ #host: 
+ #port:
+
+
+## Set these if using a MySQL instance in your cluster 
+# mysqlRootPassword: 
+
+## Set these if using a Postgres instance in your cluster 
+# postgresUser:
+# postgresPassword: 
+
+domainName: https://your-wallabag-url.com
+
+## Over ride name and fullname ($release-$name)
+# nameOverride: 
+# fullnameOverride: 
+
+## FROM: https://github.com/kubernetes/charts/blob/master/stable/postgresql/values.yaml
+## Persist data to a persitent volume
+persistence:
+  enabled: true
+
+  ## A manually managed Persistent Volume and Claim
+  ## Requires persistence.enabled: true
+  ## If defined, PVC must be created manually before volume will be bound
+  # existingClaim:
+
+  ## database data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp3 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+  # annotations: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  externalIPs: []
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+
+networkPolicy:
+  ## Enable creation of NetworkPolicy resources.
+  ##
+  enabled: false
+
+  ## The Policy model to apply. When set to false, only pods with the correct
+  ## client label will have network access to the port PostgreSQL is listening
+  ## on. When true, PostgreSQL will accept connections from any source
+  ## (with the correct destination port).
+  ##
+  allowExternal: true

@@ -1,0 +1,108 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "wallabag.fullname" . }}
+  labels:
+    app: {{ template "wallabag.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "wallabag.fullname" . }}
+  template:
+    metadata:
+        labels:
+          app: {{ template "wallabag.fullname" . }}
+          chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+          release: "{{ .Release.Name }}"
+          heritage: "{{ .Release.Service }}"
+    spec:
+      containers:
+      - name: wallabag
+        image: wallabag/wallabag
+        resources:
+          {{- with .Values.resources }}
+          requests: 
+            memory: {{ .requests.memory }}
+            cpu: {{ .requests.cpu }}
+          {{- end }}
+        volumeMounts:
+        - mountPath: /var/www/wallabag/web/assets/images
+          name: {{ template "wallabag.name" . }}-claim
+        env:
+        {{- if eq .Values.database.driver "pdo_mysql"}}
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: mysql-root-password
+        {{- end }}
+        {{- if eq .Values.database.driver "pdo_pgsql"}}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: postgres-password
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: postgres-user
+        {{- end }}
+        - name: SYMFONY__ENV__DATABASE_DRIVER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: database-driver
+        - name: SYMFONY__ENV__DATABASE_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: database-host
+        - name: SYMFONY__ENV__DATABASE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: database-name
+        - name: SYMFONY__ENV__DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: database-password
+        - name: SYMFONY__ENV__DATABASE_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: database-port
+        - name: SYMFONY__ENV__DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wallabag.fullname" . }}
+              key: database-user
+        - name: SYMFONY__ENV__FOSUSER_CONFIMRATION
+          value: "false"
+        - name: SYMFONY__ENV__FOSUSER_REGISTRATION
+          value: "false"
+        - name: SYMFONY__ENV__FROM_EMAIL
+          value: test@test.com
+        - name: SYMFONY__ENV__MAILER_HOST
+          value: 127.0.0.1
+        - name: SYMFONY__ENV__MAILER_PASSWORD
+          value: "~"
+        - name: SYMFONY__ENV__MAILER_USER
+          value: "~"
+        - name: SYMFONY__ENV__DOMAIN_NAME
+          value: {{ .Values.domainName }}
+        ports:
+        - containerPort: {{ .Values.service.port }} 
+      restartPolicy: Always
+      volumes:
+      - name: {{ template "wallabag.name" . }}-claim
+      {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | default (include "wallabag.fullname" .) }}
+      {{- end }}

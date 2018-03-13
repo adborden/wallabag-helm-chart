@@ -1,0 +1,16 @@
+# Wallabag
+
+Default database is SQLite.
+You have to provide all database related values.
+Check `values.yaml` to see what is needed.
+ 
+Dont forget to set your domain name correctly.
+
+## MySQL and PostgresQL
+For MySQL or Postges the **PHP** `databaseDriver` has to set correctly as well as the access credentials.
+Wallabag requires access to a root user on the database.
+
+
+## NOTE
+At time of development the database port has to be provided as a string.
+More here: https://github.com/kubernetes/helm/issues/1707
