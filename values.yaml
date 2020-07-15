@@ -1,26 +1,26 @@
 # PostgresQL => 'pdo_pgsql'
 # MySQL => 'pdo_mysql'
 database:
-  driver: pdo_sqlite 
+  driver: pdo_sqlite
   name: wallabag
   user: wallabag-user
   password: Me3hlqSpnV7A15LFOxzS2nmsZ
- #host: 
+ #host:
  #port:
 
 
-## Set these if using a MySQL instance in your cluster 
-# mysqlRootPassword: 
+## Set these if using a MySQL instance in your cluster
+# mysqlRootPassword:
 
-## Set these if using a Postgres instance in your cluster 
+## Set these if using a Postgres instance in your cluster
 # postgresUser:
-# postgresPassword: 
+# postgresPassword:
 
 domainName: https://your-wallabag-url.com
 
 ## Over ride name and fullname ($release-$name)
-# nameOverride: 
-# fullnameOverride: 
+# nameOverride:
+# fullnameOverride:
 
 ## FROM: https://github.com/kubernetes/charts/blob/master/stable/postgresql/values.yaml
 ## Persist data to a persitent volume
@@ -70,3 +70,24 @@ networkPolicy:
   ## (with the correct destination port).
   ##
   allowExternal: true
+
+ingress:
+  enabled: false
+  # Values can be templated
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  labels: {}
+  path: /
+  hosts:
+    - chart-example.local
+  ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  extraPaths: []
+  # - path: /*
+  #   backend:
+  #     serviceName: ssl-redirect
+  #     servicePort: use-annotation
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
